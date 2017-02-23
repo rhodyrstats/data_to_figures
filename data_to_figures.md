@@ -11,6 +11,28 @@ For this short workshop we will use two datasets and create two separate plots, 
 Brief refresher on the basics of `ggplot2`
 ------------------------------------------
 
+I realize that for some of you it may have been a while since you've used `ggplot2`. We will go through the basics again quickly.
+
+The three (four, really) functions for building up a `ggplot` object are 1) `ggplot()`, 2) `aes()`, 3) `geom_xxx()`, and 4) this one is optional, but `theme()` or `theme_xxx()` will let you change the look and feel.
+
+Using these, and the `iris` data frame we can build a quick scatterplot:
+
+``` r
+petal_l_w <- ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) + geom_point()
+petal_l_w
+```
+
+![](data_to_figures_files/figure-markdown_github/refersher1-1.png)
+
+And if we want to change the way this looks, we could use `theme()` or use some of the canned themes such as `theme_classic()`:
+
+``` r
+petal_l_w <- petal_l_w + theme_classic()
+petal_l_w
+```
+
+![](data_to_figures_files/figure-markdown_github/referesher2-1.png)
+
 Bar chart with error bars
 -------------------------
 
@@ -69,7 +91,7 @@ nla12_bar_data
 
     ## # A tibble: 18 × 4
     ##    FW_ECO9   variable      mean  std_error
-    ##     <fctr>      <chr>     <dbl>      <dbl>
+    ##      <chr>      <chr>     <dbl>      <dbl>
     ## 1      CPL   nitrogen 0.6822705 0.03554801
     ## 2      NAP   nitrogen 0.3253554 0.01715347
     ## 3      NPL   nitrogen 1.1103478 0.06460114
@@ -93,7 +115,7 @@ Now that was easy!
 
 Well, I am being sarcastic, because getting the data ready is really about 90% of the effort and those few lines of code can often take quite a bit of effort to get right. But this workshop is about plotting, so can't spend too much time on this.
 
-Now, let's start building out our plot.
+Now, let's start building out our plot. First, the bar chart and error bars.
 
 ``` r
 nla12_bar <- ggplot(nla12_bar_data,aes(x = FW_ECO9, y = mean, fill = variable)) +
@@ -119,8 +141,8 @@ library(forcats)
 eco9_ord <- nla12_bar_data %>% filter(variable == "phosphorus") %>% arrange(desc(mean)) %>% 
     .$FW_ECO9
 
-nla12_bar_data <- nla12_bar_data %>% mutate(desc_ecoregion = fct_relevel(factor(FW_ECO9, 
-    eco9_ord)))
+nla12_bar_data <- nla12_bar_data %>% mutate(desc_ecoregion = fct_relevel(FW_ECO9, 
+    eco9_ord))
 ```
 
 Now with that done, we can recreate our plot from above
@@ -140,7 +162,7 @@ nla12_bar
 And lastly maybe I want phosphorus first. This is a bit more straightforward.
 
 ``` r
-nla12_bar <- ggplot(nla12_bar_data,aes(x = desc_ecoregion, y = mean, fill = fct_relevel(factor(variable),"phosphorus" ,"nitrogen")))+
+nla12_bar <- ggplot(nla12_bar_data,aes(x = desc_ecoregion, y = mean, fill = fct_relevel(variable,"phosphorus" ,"nitrogen")))+
   geom_bar(stat = "identity", position = position_dodge()) +
   geom_errorbar(aes(ymin=mean-std_error, ymax=mean+std_error),
                   width=.2,                    # Width of the error bars
