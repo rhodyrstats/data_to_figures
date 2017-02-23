@@ -20,6 +20,9 @@ opts_chunk$set(tidy=T, root.dir = ".")
 
 For this short workshop we will use two datasets and create two separate plots, a bar chart with error bars and a depth profile plot.  From this we should learn how to create these plots with `ggplot2`, learn that datasets need to be manipulated for different visualizations, and learn how to save the plots to files for inclusion into a manuscript.  
 
+## Brief refresher on the basics of `ggplot2`
+
+
 ## Bar chart with error bars
 
 (These instructions inspired by the [R Graphics Cookbook](http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/#bar-graphs))
@@ -29,7 +32,7 @@ For this example, we will be interested in looking at Nitrogen and Phosphorus co
 
 ### Data for bar chart: NLA 2012
 
-Assuming we still have access to it, we will use the NLA 2012 water quality data for the bar chart with error bars.  Specifically we will be interested in total nitrogen, total phosphorus, and ecoregion.  First, let's load up our packages:
+For this, we will use the NLA 2012 water quality data for the bar chart with error bars.  Specifically we will be interested in total nitrogen, total phosphorus, and ecoregion.  First, let's load up our packages:
 
 ```{r packages}
 library(dplyr) # For some basic data massaging
@@ -37,9 +40,9 @@ library(tidyr) # Also for some basic data massaging
 library(ggplot2) # For the plots
 ```
 
-Next, to get the data:
+Next, the code to get the data directly from EPA is below.  This is just for reference.  For this workhsop and in the interest of time I have provided a cleaned up version of this which can be read in with `r nla12 <- read.csv("https://raw.githubusercontent.com/rhodyrstats/data_to_figures/master/nla12.csv")`. 
 
-```{r data}
+```{r data1, eval = FALSE}
 nla12_wq_url <- "https://www.epa.gov/sites/production/files/2016-12/nla2012_waterchem_wide.csv"
 nla12_site_url <- "https://www.epa.gov/sites/production/files/2016-12/nla2012_wide_siteinfo_08232016.csv"
 
@@ -49,14 +52,12 @@ nla12_site <- read.csv(nla12_site_url, stringsAsFactors = FALSE)
 nla12 <- full_join(nla12_wq,nla12_site) %>%
   filter(VISIT_NO == 1) %>%
   select(SITE_ID, FW_ECO9, NTL_RESULT, PTL_RESULT) %>%
-  na.omit()
-tbl_df(nla12)  
+  na.omit() #Not best practice necessarily, but cleaner for examples.
 ```
 
-So now we have total nutrients and a categorical representing the ecoregion for the data.  Chances are that the data won't be in the form that we need to actually build the plot.  
-
+So now we have total nutrients and a categorical representing the ecoregion for the data.  Often, the structure of the data frame and the structure required to build the plot are different.  Thus we need to manipulate the data so that we may actually build the plot.  
 ### Manipulating the data
-Remember, for this example we are going to plot nutrients vs. ecoregions, thus, we will need to summarize the per lake data on an ecoregional basis and get the mean and standard error for each nutrient within each ecoregion.   Also, many of the `ggplot2` functions will easily create seperate plots if a catergorical factor is supplied.  We will keep this in mind becuase we want different bars for each of the variables.
+Remember, for this example we are going to plot nutrients vs. ecoregions, thus, we will need to summarize the per lake data on an ecoregional basis and get the mean and standard error for each nutrient within each ecoregion.   Also, many of the `ggplot2` functions will easily create seperate plots if a categorical factor is supplied.  We will keep this in mind becuase we want different bars for each of the variables.
 
 Given this we need a data frame that looks like:
 
@@ -81,7 +82,11 @@ nla12_bar_data <- full_join(nla12_bar_mean, nla12_bar_se)
 nla12_bar_data
 ```
 
-Now that was easy!  I am being sarcastic, because getting the data ready is really about 90% of the effort.  In reality this usually takes me a couple of iterations of getting things wrong. Now we can use this to build out our plot.
+Now that was easy!  
+
+Well, I am being sarcastic, because getting the data ready is really about 90% of the effort and those few lines of code can often take quite a bit of effort to get right. But this workshop is about plotting, so can't spend too much time on this.
+
+Now, let's start building out our plot.
 
 ```{r barchart}
 nla12_bar <- ggplot(nla12_bar_data,aes(x = FW_ECO9, y = mean, fill = variable)) +
