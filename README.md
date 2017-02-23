@@ -1,0 +1,2 @@
+# data_to_figures
+This mini-workshop will cover using ggplot2 to go from data to figures for a paper.
