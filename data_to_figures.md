@@ -1,15 +1,24 @@
--   [Making the figures](#making-the-figures)
-    -   [Brief refresher on the basics of `ggplot2`](#brief-refresher-on-the-basics-of-ggplot2)
-    -   [Bar chart with error bars](#bar-chart-with-error-bars)
-    -   [Depth Profile, ala Warren](#depth-profile-ala-warren)
-
-Making the figures
-==================
+-   [Brief refresher on the basics of `ggplot2`](#brief-refresher-on-the-basics-of-ggplot2)
+-   [Bar chart with error bars](#bar-chart-with-error-bars)
+    -   [Data for bar chart: NLA 2012](#data-for-bar-chart-nla-2012)
+    -   [Re-order x-axis](#re-order-x-axis)
+    -   [Change color of bars](#change-color-of-bars)
+    -   [Move beyond the default theme](#move-beyond-the-default-theme)
+    -   [Saving the figure](#saving-the-figure)
+    -   [Exercise 1. Make a bar chart](#exercise-1.-make-a-bar-chart)
+-   [Depth Profile, ala Warren](#depth-profile-ala-warren)
+    -   [Get the data](#get-the-data)
+    -   [Build the plot](#build-the-plot)
+    -   [Set up the x-axis](#set-up-the-x-axis)
+    -   [Set up the y-axis](#set-up-the-y-axis)
+    -   [Customize the look and feel.](#customize-the-look-and-feel.)
+    -   [The whole thing](#the-whole-thing)
+    -   [What If you need a lot of them?](#what-if-you-need-a-lot-of-them)
 
 For this short workshop we will use two datasets and create two separate plots, a bar chart with error bars and a depth profile plot. From this we should learn how to create these plots with `ggplot2`, learn that datasets need to be manipulated for different visualizations, and learn how to save the plots to files for inclusion into a manuscript.
 
 Brief refresher on the basics of `ggplot2`
-------------------------------------------
+==========================================
 
 I realize that for some of you it may have been a while since you've used `ggplot2`. We will go through the basics again quickly.
 
@@ -34,14 +43,15 @@ petal_l_w
 ![](data_to_figures_files/figure-markdown_github/referesher2-1.png)
 
 Bar chart with error bars
--------------------------
+=========================
 
 (These instructions inspired by the [R Graphics Cookbook](http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/#bar-graphs))
 
 Prior to jumping into coding any figure I like to think a bit about what I want to show and will actually sketch that out on paper. Doing this also forces you to start thinking about what data you need to create that figure. In the case of the bar chart with error bars at a minimum we will need some mean value to plot and some representation of error for the error bars. Another common thing to do is plot this for multiple categories and for multiple values.
 For this example, we will be interested in looking at Nitrogen and Phosphorus concentrations across ecoregions. Let's first start with the data.
 
-### Data for bar chart: NLA 2012
+Data for bar chart: NLA 2012
+----------------------------
 
 For this, we will use the NLA 2012 water quality data for the bar chart with error bars. Specifically we will be interested in total nitrogen, total phosphorus, and ecoregion. First, let's load up our packages:
 
@@ -51,7 +61,7 @@ library(tidyr)  # Also for some basic data massaging
 library(ggplot2)  # For the plots
 ```
 
-Next, the code to get the data directly from EPA is below. This is just for reference. For this workhsop and in the interest of time I have provided a cleaned up version of this which can be read in with .
+Next, the code to get the data directly from EPA is below. This is just for reference. For this workshop and in the interest of time I have provided a cleaned up version of this which can be read in with .
 
 ``` r
 nla12_wq_url <- "https://www.epa.gov/sites/production/files/2016-12/nla2012_waterchem_wide.csv"
@@ -65,7 +75,7 @@ nla12 <- full_join(nla12_wq, nla12_site) %>% filter(VISIT_NO == 1) %>% select(SI
 ```
 
 So now we have total nutrients and a categorical representing the ecoregion for the data. Often, the structure of the data frame and the structure required to build the plot are different. Thus we need to manipulate the data so that we may actually build the plot.
-\#\#\# Manipulating the data Remember, for this example we are going to plot nutrients vs. ecoregions, thus, we will need to summarize the per lake data on an ecoregional basis and get the mean and standard error for each nutrient within each ecoregion. Also, many of the `ggplot2` functions will easily create seperate plots if a categorical factor is supplied. We will keep this in mind becuase we want different bars for each of the variables.
+\#\# Manipulating the data Remember, for this example we are going to plot nutrients vs. ecoregions, thus, we will need to summarize the per lake data on an ecoregional basis and get the mean and standard error for each nutrient within each ecoregion. Also, many of the `ggplot2` functions will easily create separate plots if a categorical factor is supplied. We will keep this in mind because we want different bars for each of the variables.
 
 Given this we need a data frame that looks like:
 
@@ -131,9 +141,10 @@ nla12_bar
 
 So that looks pretty good, but their might be a lot of other change you might want to see with this figure. We will consider three:
 
-### Re-order x-axis
+Re-order x-axis
+---------------
 
-I find bar charts to be fairly difficult to read accurately so getting order of the ecoregions is not easy. One way to get at that is to order the x-axis based on one of the variables. For this we will re-order the axis, in descending order of mean Phosphorus. `ggplot2` uses the order of a factor to do this. And while we could do this with base R, that'd make our heads hurt, so Hadley to the rescue with the `forcats` package and som `magrittr` kung fu.
+I find bar charts to be fairly difficult to read accurately so getting order of the ecoregions is not easy. One way to get at that is to order the x-axis based on one of the variables. For this we will re-order the axis, in descending order of mean Phosphorus. `ggplot2` uses the order of a factor to do this. And while we could do this with base R, that'd make our heads hurt, so Hadley to the rescue with the `forcats` package and some `magrittr` kung fu.
 
 ``` r
 library(forcats)
@@ -173,9 +184,10 @@ nla12_bar
 
 ![](data_to_figures_files/figure-markdown_github/barchart2-1.png)
 
-### Change color of bars
+Change color of bars
+--------------------
 
-Believe it or not, there is a fair bit of research behind which colors we should use for plots that aid in interpretation, are readable by those with colorblindness, etc. So the defualt is probably good while we build the plot, but we almost always want to move beyond that. For this we will use the [`viridis` package](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
+Believe it or not, there is a fair bit of research behind which colors we should use for plots that aid in interpretation, are readable by those with colorblindness, etc. So the default is probably good while we build the plot, but we almost always want to move beyond that. For this we will use the [`viridis` package](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
 
 ``` r
 library(viridis)
@@ -186,7 +198,8 @@ nla12_bar
 
 ![](data_to_figures_files/figure-markdown_github/viridis-1.png)
 
-### Move beyond the default theme
+Move beyond the default theme
+-----------------------------
 
 Lastly, the default theme is fine, but we probably want to tweak it some. In particular for this plot let's change up the background and fix our legend title.
 
@@ -218,7 +231,7 @@ nla12_bar
 
 ![](data_to_figures_files/figure-markdown_github/themes1-1.png)
 
-This shows the way to do that with a bunch of custom settings. For a quicker version of doing this, you can use some of the canned themes in `ggplot2` or use the `ggthemes` package for many additional ones. Some example sof using one of the `ggplot2` ones is below. Also note, I am not saving these to an object so result is a temporary view of what the plot would have looked like.
+This shows the way to do that with a bunch of custom settings. For a quicker version of doing this, you can use some of the canned themes in `ggplot2` or use the `ggthemes` package for many additional ones. Some examples of using one of the `ggplot2` ones is below. Also note, I am not saving these to an object so result is a temporary view of what the plot would have looked like.
 
 ``` r
 nla12_bar + theme_bw()
@@ -238,7 +251,8 @@ nla12_bar + theme_minimal()
 
 ![](data_to_figures_files/figure-markdown_github/canned-3.png)
 
-### Saving the figure
+Saving the figure
+-----------------
 
 Once you have the details of your figure, figured (he, he) out you need to move it from the screen and into your manuscript. This requires saving the output to a file. The `ggplot2` package comes with a function to facilitate this, `ggsave()`. To output a ggplot2 object to a high resolution tiff:
 
@@ -247,7 +261,7 @@ ggsave(filename = "nla_bar_chart.tiff", plot = nla12_bar, width = 8, height = 4,
     units = "in", dpi = 300)
 ```
 
-This should get you pretty close to providing the figures required by the journal you are submitting too. If there are additional things you need to do your figure you can either edit the file directly in an image processing program (e.g. gimp or irfanview) or you can manipulate the file in R with the `magick` package, essentially an R client for ImageMagick. Using `magick` is a bit beyond the scope of what we want to do today, but I will show a quick example of something I had to do for a paper recently: remlibmagick++-devove white space around borders of the image. We can do with this using the auto crop functionality in `magick`.
+This should get you pretty close to providing the figures required by the journal you are submitting too. If there are additional things you need to do your figure you can either edit the file directly in an image processing program (e.g. gimp or irfanview) or you can manipulate the file in R with the `magick` package, essentially an R client for ImageMagick. Using `magick` is a bit beyond the scope of what we want to do today, but I will show a quick example of something I had to do for a paper recently: remove white space around borders of the image. We can do with this using the auto crop functionality in `magick`.
 
 ``` r
 library(magick)
@@ -264,7 +278,8 @@ The trimmed version:
 
 ![](nla_bar_chart_trim.tiff)
 
-### Exercise 1. Make a bar chart
+Exercise 1. Make a bar chart
+----------------------------
 
 1.) Let's make a similar chart, but instead of nutrients, let's plot mean and standard error of turbidity by HUC Regions (HUC2). 2.) To get you started, the data needs to be manipulated:
 
@@ -282,7 +297,7 @@ nla12_bar_data_turb <- full_join(nla12_bar_mean_turb, nla12_bar_se_turb)
 3.) Now look back at the examples and see if you can create a bar chart that shows the mean, and error bars of turbidity by HUC Region.
 
 Depth Profile, ala Warren
--------------------------
+=========================
 
 (Shout out to EPA colleague Warren Boothman for suggesting this and providing example data.)
 
@@ -292,9 +307,10 @@ A common type of plot is a depth profile where some measurement is recorded alon
 
 The full use case that Warren and I discussed about this was to create a way to create these plots of many sites. To me, this calls out for writing a function that creates the plots. Prior to jumping into that, what we can do is get the data set up and the plot figured out.
 
-### Get the data
+Get the data
+------------
 
-Again, thanks to Warren for providing the example data which is saved as a spreadsheet. Overall the fromatting is pretty clean (which is good), but there are a few things we will need to do read it in properly. Here's a screen grab of what the spreadsheet looks like:
+Again, thanks to Warren for providing the example data which is saved as a spreadsheet. Overall the formatting is pretty clean (which is good), but there are a few things we will need to do read it in properly. Here's a screen grab of what the spreadsheet looks like:
 
 ![](spreadsheet.jpg)
 
@@ -332,7 +348,8 @@ core
 
 So that got us pretty close, but first thing you'll notice is that the dates are completely wacky. We will ignore that for the time being (subject of another meeting, perhaps).
 
-### Build the plot
+Build the plot
+--------------
 
 First thing we need to do is get the basic `ggplot2` object set up:
 
@@ -344,7 +361,8 @@ ggprofile
 
 ![](data_to_figures_files/figure-markdown_github/ggprofile-1.png)
 
-### Set up the x-axis
+Set up the x-axis
+-----------------
 
 ``` r
 x_brks <- seq(0, 100, by = 25)
@@ -356,7 +374,8 @@ ggprofile
 
 ![](data_to_figures_files/figure-markdown_github/ggprofile2-1.png)
 
-### Set up the y-axis
+Set up the y-axis
+-----------------
 
 ``` r
 y_brks <- seq(0, 25, by = 5)
@@ -372,7 +391,8 @@ ggprofile
 
 ![](data_to_figures_files/figure-markdown_github/ggprofile3-1.png)
 
-### Customize the look and feel.
+Customize the look and feel.
+----------------------------
 
 The plot that we are trying to mimic has no panel, has tick marks on the axes, has some custom labels, and is plotted in a different color.
 
@@ -388,7 +408,8 @@ ggprofile
 
 ![](data_to_figures_files/figure-markdown_github/ggprofile4-1.png)
 
-### The whole thing
+The whole thing
+---------------
 
 ``` r
 x_brks <- seq(0, 100, by = 5)
@@ -413,7 +434,8 @@ ggprofile
 
 ![](data_to_figures_files/figure-markdown_github/ggprofile_all-1.png)
 
-### What If you need a lot of them?
+What If you need a lot of them?
+-------------------------------
 
 Often you have multiple sites, and as long as you data is set up to handle it, you can kick out a lot of figures using essentially the same code. As an example, we can create some new data
 
