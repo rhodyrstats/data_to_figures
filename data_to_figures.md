@@ -263,7 +263,7 @@ Once you have the details of your figure, figured (he, he) out you need to move 
 
 ``` r
 ggsave(filename = "nla_bar_chart.tiff", plot = nla12_bar, width = 8, height = 4, 
-    units = "in", dpi = 300)
+    units = "in", dpi = 150)
 ```
 
 This should get you pretty close to providing the figures required by the journal you are submitting too. If there are additional things you need to do your figure you can either edit the file directly in an image processing program (e.g. gimp or irfanview) or you can manipulate the file in R with the `magick` package, essentially an R client for ImageMagick. Using `magick` is a bit beyond the scope of what we want to do today, but I will show a quick example of something I had to do for a paper recently: remove white space around borders of the image. We can do with this using the auto crop functionality in `magick`.
