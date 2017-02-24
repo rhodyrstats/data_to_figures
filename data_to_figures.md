@@ -63,7 +63,7 @@ library(tidyr)  # Also for some basic data massaging
 library(ggplot2)  # For the plots
 ```
 
-Next, the code to get the data directly from EPA is below. This is just for reference. For this workshop and in the interest of time I have provided a cleaned up version of this which can be read in with .
+Next, the code to get the data directly from EPA is below. This is just for reference. For this workshop and in the interest of time I have provided a cleaned up version of this which can be read in with `nla12 <- read.csv("https://raw.githubusercontent.com/rhodyrstats/data_to_figures/master/nla12.csv", stringsAsFactors = FALSE)`.
 
 ``` r
 nla12_wq_url <- "https://www.epa.gov/sites/production/files/2016-12/nla2012_waterchem_wide.csv"
