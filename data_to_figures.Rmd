@@ -33,7 +33,7 @@ petal_l_w <- ggplot(iris, aes(x=Petal.Length, y=Petal.Width)) +
 petal_l_w
 ```
 
-And if we want to change the way this looks, we could use `theme()` or use some of the canned themes such as `theme_classic()`:
+And if we want to change the way this looks, we could use `theme()` for full customization or we could use some of the canned themes such as `theme_classic()`:
 
 ```{r referesher2}
 petal_l_w <- petal_l_w + 
@@ -74,6 +74,7 @@ nla12 <- full_join(nla12_wq,nla12_site) %>%
 ```
 
 So now we have total nutrients and a categorical representing the ecoregion for the data.  Often, the structure of the data frame and the structure required to build the plot are different.  Thus we need to manipulate the data so that we may actually build the plot.  
+
 ## Manipulating the data
 Remember, for this example we are going to plot nutrients vs. ecoregions, thus, we will need to summarize the per lake data on an ecoregional basis and get the mean and standard error for each nutrient within each ecoregion.   Also, many of the `ggplot2` functions will easily create separate plots if a categorical factor is supplied.  We will keep this in mind because we want different bars for each of the variables.
 
@@ -102,7 +103,7 @@ nla12_bar_data
 
 Now that was easy!  
 
-Well, I am being sarcastic, because getting the data ready is really about 90% of the effort and those few lines of code can often take quite a bit of effort to get right. But this workshop is about plotting, so can't spend too much time on this.
+Well, I am being sarcastic, because getting the data ready is really about 90% of the effort and those few lines of code, figuring out the best data structure, etc. can take quite a bit of effort to get right. But this workshop is about plotting, so we can't spend too much time on this.
 
 Now, let's start building out our plot.  First, the bar chart and error bars.
 
@@ -134,7 +135,7 @@ nla12_bar_data <- nla12_bar_data %>%
   mutate(desc_ecoregion = fct_relevel(FW_ECO9,eco9_ord))
 ```
 
-Now with that done, we can recreate our plot from above
+Now with that done, we can recreate our plot from above, this time using the new ecoregion vector we added to our data frame.
 
 ```{r barchart_order}
 nla12_bar <- ggplot(nla12_bar_data,aes(x = desc_ecoregion, y = mean, fill = variable)) +
@@ -146,7 +147,7 @@ nla12_bar <- ggplot(nla12_bar_data,aes(x = desc_ecoregion, y = mean, fill = vari
 nla12_bar
 ```
 
-And lastly maybe I want phosphorus first.  This is a bit more straightforward.
+And lastly maybe I want phosphorus first.  This is a bit more straightforward and we will do it a bit differently and use the `fct_relevel()` directly in the `aes()` call.
 
 ```{r barchart2}
 nla12_bar <- ggplot(nla12_bar_data,aes(x = desc_ecoregion, y = mean, fill = fct_relevel(variable,"phosphorus" ,"nitrogen")))+
@@ -160,7 +161,7 @@ nla12_bar
 
 ## Change color of bars
 
-Believe it or not, there is a fair bit of research behind which colors we should use for plots that aid in interpretation, are readable by those with colorblindness, etc.  So the default is probably good while we build the plot, but we almost always want to move beyond that.  For this we will use the [`viridis` package](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
+Believe it or not, there is a fair bit of research behind which colors we should use for plots that aid in interpretation, are readable by those with colorblindness, etc.  So the default is probably good while we build the plot, but we almost always want to move beyond that.  For this we will use the [`viridis` package](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html) which is backed up by this research.  Some other options that we could use are [`wesanderson`](https://github.com/karthik/wesanderson), [`RSkittleBrewer`](https://github.com/alyssafrazee/RSkittleBrewer), or [`RColorBrewer`](https://cran.r-project.org/web/packages/RColorBrewer/index.html).  
 
 ```{r viridis}
 library(viridis)
@@ -219,7 +220,7 @@ nla12_bar +
 
 Once you have the details of your figure, figured (he, he) out you need to move it from the screen and into your manuscript.  This requires saving the output to a file.  The `ggplot2` package comes with a function to facilitate this, `ggsave()`.  To output a ggplot2 object to a high resolution tiff:
 
-```{r ggsave, eval = FALSE}
+```{r ggsave, eval = TRUE}
 ggsave(filename = "nla_bar_chart.tiff",
        plot = nla12_bar,
        width = 8,
@@ -230,7 +231,7 @@ ggsave(filename = "nla_bar_chart.tiff",
 
 This should get you pretty close to providing the figures required by the journal you are submitting too.  If there are additional things you need to do your figure you can either edit the file directly in an image processing program (e.g. gimp or irfanview) or you can manipulate the file in R with the `magick` package, essentially an R client for ImageMagick.  Using `magick` is a bit beyond the scope of what we want to do today, but I will show a quick example of something I had to do for a paper recently: remove white space around borders of the image.  We can do with this using the auto crop functionality in `magick`.
 
-```{r autocrop, eval = FALSE}
+```{r autocrop, eval = TRUE}
 library(magick)
 nla_fig <- image_read("nla_bar_chart.tiff")
 nla_fig <- image_trim(nla_fig)

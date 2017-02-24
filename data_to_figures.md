@@ -1,6 +1,7 @@
 -   [Brief refresher on the basics of `ggplot2`](#brief-refresher-on-the-basics-of-ggplot2)
 -   [Bar chart with error bars](#bar-chart-with-error-bars)
     -   [Data for bar chart: NLA 2012](#data-for-bar-chart-nla-2012)
+    -   [Manipulating the data](#manipulating-the-data)
     -   [Re-order x-axis](#re-order-x-axis)
     -   [Change color of bars](#change-color-of-bars)
     -   [Move beyond the default theme](#move-beyond-the-default-theme)
@@ -33,7 +34,7 @@ petal_l_w
 
 ![](data_to_figures_files/figure-markdown_github/refersher1-1.png)
 
-And if we want to change the way this looks, we could use `theme()` or use some of the canned themes such as `theme_classic()`:
+And if we want to change the way this looks, we could use `theme()` for full customization or we could use some of the canned themes such as `theme_classic()`:
 
 ``` r
 petal_l_w <- petal_l_w + theme_classic()
@@ -75,7 +76,11 @@ nla12 <- full_join(nla12_wq, nla12_site) %>% filter(VISIT_NO == 1) %>% select(SI
 ```
 
 So now we have total nutrients and a categorical representing the ecoregion for the data. Often, the structure of the data frame and the structure required to build the plot are different. Thus we need to manipulate the data so that we may actually build the plot.
-\#\# Manipulating the data Remember, for this example we are going to plot nutrients vs. ecoregions, thus, we will need to summarize the per lake data on an ecoregional basis and get the mean and standard error for each nutrient within each ecoregion. Also, many of the `ggplot2` functions will easily create separate plots if a categorical factor is supplied. We will keep this in mind because we want different bars for each of the variables.
+
+Manipulating the data
+---------------------
+
+Remember, for this example we are going to plot nutrients vs. ecoregions, thus, we will need to summarize the per lake data on an ecoregional basis and get the mean and standard error for each nutrient within each ecoregion. Also, many of the `ggplot2` functions will easily create separate plots if a categorical factor is supplied. We will keep this in mind because we want different bars for each of the variables.
 
 Given this we need a data frame that looks like:
 
@@ -123,7 +128,7 @@ nla12_bar_data
 
 Now that was easy!
 
-Well, I am being sarcastic, because getting the data ready is really about 90% of the effort and those few lines of code can often take quite a bit of effort to get right. But this workshop is about plotting, so can't spend too much time on this.
+Well, I am being sarcastic, because getting the data ready is really about 90% of the effort and those few lines of code, figuring out the best data structure, etc. can take quite a bit of effort to get right. But this workshop is about plotting, so we can't spend too much time on this.
 
 Now, let's start building out our plot. First, the bar chart and error bars.
 
@@ -156,7 +161,7 @@ nla12_bar_data <- nla12_bar_data %>% mutate(desc_ecoregion = fct_relevel(FW_ECO9
     eco9_ord))
 ```
 
-Now with that done, we can recreate our plot from above
+Now with that done, we can recreate our plot from above, this time using the new ecoregion vector we added to our data frame.
 
 ``` r
 nla12_bar <- ggplot(nla12_bar_data,aes(x = desc_ecoregion, y = mean, fill = variable)) +
@@ -170,7 +175,7 @@ nla12_bar
 
 ![](data_to_figures_files/figure-markdown_github/barchart_order-1.png)
 
-And lastly maybe I want phosphorus first. This is a bit more straightforward.
+And lastly maybe I want phosphorus first. This is a bit more straightforward and we will do it a bit differently and use the `fct_relevel()` directly in the `aes()` call.
 
 ``` r
 nla12_bar <- ggplot(nla12_bar_data,aes(x = desc_ecoregion, y = mean, fill = fct_relevel(variable,"phosphorus" ,"nitrogen")))+
@@ -187,7 +192,7 @@ nla12_bar
 Change color of bars
 --------------------
 
-Believe it or not, there is a fair bit of research behind which colors we should use for plots that aid in interpretation, are readable by those with colorblindness, etc. So the default is probably good while we build the plot, but we almost always want to move beyond that. For this we will use the [`viridis` package](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
+Believe it or not, there is a fair bit of research behind which colors we should use for plots that aid in interpretation, are readable by those with colorblindness, etc. So the default is probably good while we build the plot, but we almost always want to move beyond that. For this we will use the [`viridis` package](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html) which is backed up by this research. Some other options that we could use are [`wesanderson`](https://github.com/karthik/wesanderson), [`RSkittleBrewer`](https://github.com/alyssafrazee/RSkittleBrewer), or [`RColorBrewer`](https://cran.r-project.org/web/packages/RColorBrewer/index.html).
 
 ``` r
 library(viridis)
