@@ -13,6 +13,7 @@
     -   [Set up the x-axis](#set-up-the-x-axis)
     -   [Set up the y-axis](#set-up-the-y-axis)
     -   [Customize the look and feel.](#customize-the-look-and-feel.)
+    -   [Getting the ticks right](#getting-the-ticks-right)
     -   [The whole thing](#the-whole-thing)
     -   [What If you need a lot of them?](#what-if-you-need-a-lot-of-them)
 
@@ -275,14 +276,6 @@ nla_fig <- image_trim(nla_fig)
 image_write(nla_fig, "nla_bar_chart_trim.tiff")
 ```
 
-The original tiff:
-
-![](nla_bar_chart.tiff)
-
-The trimmed version:
-
-![](nla_bar_chart_trim.tiff)
-
 Exercise 1. Make a bar chart
 ----------------------------
 
@@ -413,8 +406,48 @@ ggprofile
 
 ![](data_to_figures_files/figure-markdown_github/ggprofile4-1.png)
 
+Getting the ticks right
+-----------------------
+
+This one takes some fancy business. We need to set the breaks (i.e. where the ticks go), and the labels on the breaks. To get a break every 5 on the x-axis and every 25 on the y-axis we can use `seq()`
+
+``` r
+x_brks <- seq(0, 100, by = 5)
+y_brks <- 25:0
+```
+
+Now to get lables just on the major axis, we create empty labels for the minor ticks. We use the modulus (i.e. the remainder) to do this.
+
+``` r
+x_tick_labels <- x_brks
+x_tick_labels[0 != x_tick_labels%%25] <- ""
+y_tick_labels <- y_brks
+y_tick_labels[0 != y_tick_labels%%5] <- ""
+```
+
+And then we add this in:
+
+``` r
+ggprofile <- ggplot(core, aes(x = Pb, y = TOP)) + geom_point(color = "#5b9bd5") + 
+    geom_path(color = "#5b9bd5") + scale_x_continuous(position = "top", limits = c(0, 
+    100), expand = c(0, 0), breaks = x_brks, labels = x_tick_labels) + scale_y_continuous(trans = "reverse", 
+    limits = c(25, 0), expand = c(0, 0), breaks = y_brks, labels = y_tick_labels) + 
+    labs(x = expression(paste(mu, "g Pb/g dry sediment", sep = "")), y = "Depth (cm)") + 
+    annotate("text", x = 10, y = 2.5, label = "GB", fontface = "bold", size = 9) + 
+    theme(text = element_text(family = "Calibri"), panel.background = element_blank(), 
+        panel.grid = element_blank(), axis.line = element_line(size = 0.75), 
+        axis.ticks = element_line(size = 0.75), axis.ticks.length = unit(0.05, 
+            "in"), axis.text = element_text(face = "bold"), axis.title = element_text(face = "bold", 
+            size = 12))
+ggprofile
+```
+
+![](data_to_figures_files/figure-markdown_github/addticks-1.png)
+
 The whole thing
 ---------------
+
+And even though we have built this iteratively, the code is usually all together in one chunk, like:
 
 ``` r
 x_brks <- seq(0, 100, by = 5)
@@ -436,8 +469,6 @@ ggprofile <- ggplot(core, aes(x = Pb, y = TOP)) + geom_point(color = "#5b9bd5") 
             size = 12))
 ggprofile
 ```
-
-![](data_to_figures_files/figure-markdown_github/ggprofile_all-1.png)
 
 What If you need a lot of them?
 -------------------------------
